@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "../../Components/Navbar";
 import Passwordinput from "../../Components/input/Passwordinput";
 import { Link } from "react-router";
@@ -9,28 +9,24 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
-    const handelSignUp = async (e) => {
-      e.preventDefault()
-      if (!name) 
-        {
-            setError("Please Enter Your Name");
-            return;
-        }
-      if (!validateEmail(email)) 
-        {
-            setError("Please Enter  Valid Email");
-            return;
-        }
-        
-  
-        if(!password)
-        {
-          setError("Please Enter the password")
-          return;
-        }
-  
-        setError("")
-    };
+  const handelSignUp = async (e) => {
+    e.preventDefault();
+    if (!name) {
+      setError("Please Enter Your Name");
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please Enter  Valid Email");
+      return;
+    }
+
+    if (!password) {
+      setError("Please Enter the password");
+      return;
+    }
+
+    setError("");
+  };
   return (
     <>
       <Navbar />
@@ -65,7 +61,7 @@ const SignUp = () => {
             </button>
 
             <p className="text-sm text-center mt-4">
-               Already have a account ?
+              Already have a account ?
               <Link
                 to="/login"
                 className=" px-1 font-medium text-primary underline "

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "../../Components/Navbar";
 import { Link } from "react-router";
 import { validateEmail } from "../../utils/helper";
@@ -11,21 +11,18 @@ const Login = () => {
   const [error, setError] = useState(null);
 
   const handelLogin = async (e) => {
-    e.preventDefault()
-    if (!validateEmail(email)) 
-      {
-          setError("Please Enter  Valid Email");
-          return;
-      }
-      
+    e.preventDefault();
+    if (!validateEmail(email)) {
+      setError("Please Enter  Valid Email");
+      return;
+    }
 
-      if(!password)
-      {
-        setError("Please Enter the password")
-        return;
-      }
+    if (!password) {
+      setError("Please Enter the password");
+      return;
+    }
 
-      setError("")
+    setError("");
   };
 
   return (
