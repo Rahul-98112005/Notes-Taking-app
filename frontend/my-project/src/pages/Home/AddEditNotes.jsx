@@ -69,11 +69,13 @@ const AddEditNotes = ({ noteData, type, onClose }) => {
         <label className="input-label">TAGS</label>
         <TagInput tags={tags} setTags={setTags} />
       </div>
+
       {error && <p className="text-red-500 text-xxs pt-4">{error}</p>}
+      
       <button
         className="btn-primary font-medium mt-5 p-3"
         onClick={() => {
-          handleAddNote;
+          handleAddNote()
         }}
       >
         ADD
