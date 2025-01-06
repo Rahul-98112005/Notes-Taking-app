@@ -1,3 +1,4 @@
 # Ignore environment configuration
 .env
 config.json
+node modules
