@@ -58,11 +58,70 @@ app.post("/create-account", async (req, res) => {
 
   return res.json({
     error: false,
-    newUser,
+    nwUser,
     accessToken,
     message: "Registration Successful",
   });
 });
+
+
+app.post("/login", async(req, res) => {
+    const { email, password } = req.body;
+
+    if(!email)
+    {
+        return res.status(400).json ({
+            msg: "Email is requires"
+        })
+    }
+    if(!password)
+    {
+        return res.status(400).json ({
+            msg: "Email is requires"
+        })
+    }
+
+    const userInfo = await user.findOne({
+          email :email
+    });
+
+    if(!userInfo)
+    {
+        return res.status(400).json({
+            msg: "User not found"
+        });
+    }
+
+
+    if(userInfo.email == email && userInfo.password == password)
+    {
+        const user = {
+            user : userInfo
+        }
+
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: "36000m"
+        });
+
+        return res.json({
+            error: false,
+            message: "Login Successful",
+            email,
+            accessToken
+        })
+    }
+    else {
+        return res.status(400).json({
+            error: true,
+            message: "Invalid Credentials"
+
+        })
+    }
+});
+
+app.post("/add-note", authenticateToken, async(req,res) => {
+    
+})
 
 app.listen(3000);
 module.exports = app;
