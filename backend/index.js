@@ -240,7 +240,38 @@ app.get("/getallnotes", authenticateToken,  async (req,res) => {
 })
 
 
+app.delete("/delete-note/:noteId" , authenticateToken, async(res,req) => {
 
+  const noteId = req.params.noteId;
+  const { user } = req.user;
+
+
+try{
+  const note = await Note.findOne({_id: noteId, userId: user._id})
+
+  if(!note) {
+    return res.status(404).json ({
+      error: true,
+      msg: "Note not Found"
+
+    })
+  }
+
+
+  await Note.deleteOne({_id: noteId, userId: user._id});
+
+  return res.json({
+    error: false,
+    msg: "Notes deleted successfully",
+  });
+} catch(error) {
+  return res.status(500).josn ({
+    error: true,
+    msg: "Internal Server Error"
+  })
+}
+
+})
 
 app.listen(3000);
 module.exports = app;
