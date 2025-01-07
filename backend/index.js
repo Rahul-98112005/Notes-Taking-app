@@ -3,7 +3,8 @@ const config = require("./config.json");
 const mongoose = require("mongoose");
 
 mongoose.connect(config.connectionString);
-const user = require("./models/user.model");
+const User = require("./models/user.model");
+const Note = require("./models/note.model")
 
 const express = require("express");
 const cors = require("cors");
@@ -41,7 +42,7 @@ app.post("/create-account", async (req, res) => {
     });
   }
 
-  const isUser = await user.findOne({ email: email });
+  const isUser = await User.findOne({ email: email });
   if (isUser) {
     return res.json({
       error: true,
@@ -49,8 +50,8 @@ app.post("/create-account", async (req, res) => {
     });
   }
 
-  const newUser = new user({ fullName, email, password });
-  await newUser.save();
+  const user = new User({ fullName, email, password });
+  await user.save();
 
   const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "36000m",
@@ -58,7 +59,7 @@ app.post("/create-account", async (req, res) => {
 
   return res.json({
     error: false,
-    nwUser,
+    user,
     accessToken,
     message: "Registration Successful",
   });
@@ -81,7 +82,7 @@ app.post("/login", async(req, res) => {
         })
     }
 
-    const userInfo = await user.findOne({
+    const userInfo = await User.findOne({
           email :email
     });
 
@@ -99,7 +100,7 @@ app.post("/login", async(req, res) => {
             user : userInfo
         }
 
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        const acessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "36000m"
         });
 
@@ -107,7 +108,7 @@ app.post("/login", async(req, res) => {
             error: false,
             message: "Login Successful",
             email,
-            accessToken
+            acessToken
         })
     }
     else {
@@ -120,7 +121,51 @@ app.post("/login", async(req, res) => {
 });
 
 app.post("/add-note", authenticateToken, async(req,res) => {
+
+const { title, content, tags } = req.body
+const { user } = req.user
+
+if(!title)
+{
+    return res.status(400).json({
+        error: true,
+        msg : "Title is required"
+    })
+}
+if(!content)
+{
+    return res.status(400).json({
+        error: true,
+        msg : "content is required"
+    })
+}
+
+try {
+    const note = new Note({
+        title, 
+        content,
+        tags: tags || [],
+        userId: user._id,
+    });
     
+    await note.save();
+
+    return res.json({
+        error: false,
+        note,
+        msg: "Note added successfully"
+    });
+
+}catch(error) {
+    console.log(error)
+    return res.status(500).json({
+      
+        error:true,
+        msg: "Internal server Error",
+        
+    })
+}
+
 })
 
 app.listen(3000);
