@@ -10,6 +10,8 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) {
+      console.log("Token received:", token);
+
       return res.status(403).json({ error: true, msg: "Invalid Token" });
     }
     req.user = user; // Attach decoded payload to req.user

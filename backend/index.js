@@ -10,16 +10,15 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+  {
+    origin: "*"
+  }
+));
 
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 
-app.get("/", (req, res) => {
-  res.json({
-    msg: "hello world",
-  });
-});
 
 app.post("/create-account", async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -100,15 +99,16 @@ app.post("/login", async(req, res) => {
             user : userInfo
         }
 
-        const acessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "36000m"
         });
+        console.log(accessToken)
 
         return res.json({
             error: false,
             message: "Login Successful",
             email,
-            acessToken
+            accessToken
         })
     }
     else {
@@ -124,6 +124,7 @@ app.post("/add-note", authenticateToken, async(req,res) => {
 
 const { title, content, tags } = req.body
 const { user } = req.user
+console.log(acessToken)
 
 if(!title)
 {
@@ -218,6 +219,28 @@ app.put("/edit-note/:noteId", authenticateToken, async ( req, res) => {
    }
 
 })
+
+app.get("/getallnotes", authenticateToken,  async (req,res) => {
+  const { user } = req.user;
+  try {
+    const notes = await Note.find({ userId: user._id}).sort({ isPinned: -1});
+
+    return res.json ({
+      error: false,
+      notes,
+      msg: "All notes retrived sucessfully "
+    });
+  } catch (error)
+  { console.log(err)
+    return res.status(500).json ({
+      error: true,
+      msg: "Internal Server Error"
+    });
+  }
+})
+
+
+
 
 app.listen(3000);
 module.exports = app;
