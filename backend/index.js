@@ -102,7 +102,7 @@ app.post("/login", async(req, res) => {
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: "36000m"
         });
-        console.log(accessToken)
+     
 
         return res.json({
             error: false,
@@ -119,6 +119,24 @@ app.post("/login", async(req, res) => {
         })
     }
 });
+
+app.get("/get-user", authenticateToken ,async(req, res) => {
+  const {user} = req.user;
+
+  const isUser = await User.findOne({_id: user._id});
+
+  if(!isUser) {
+
+return res.sendStatus(401);
+  }
+
+    return res.json({
+   user: {fullName: isUser.fullNmae},
+   msg: ""
+    });
+
+
+})
 
 app.post("/add-note", authenticateToken, async(req,res) => {
 
