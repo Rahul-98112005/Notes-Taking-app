@@ -168,5 +168,56 @@ try {
 
 })
 
+
+app.put("/edit-note/:noteId", authenticateToken, async ( req, res) => {
+   const noteId = req.params.noteId;
+   const { title, content, tags, isPinned } = req.body;
+   const { user } = req.user
+
+   if(!title && !content && !tags) {
+     return res.status(400).json({
+      error: true,
+      msg: "No chnages provided"
+     })
+   }
+
+   try {
+    const note = await Note.findOne({_id: noteId, userId: user._id});
+
+    if(!note)
+    {
+      return res.status(404).json({
+        error:true,
+        msg: "Notes not found"
+      })
+    }
+    if(title)
+      note.title = title;
+    if(content)
+      note.content = content;
+    if(tags)
+      note.tags= tags;
+    if(isPinned)
+      note.isPinned = isPinned;
+
+    await note.save();
+
+    return res.json({
+      error: false,
+      note,
+      msg: "Note updated  successfully",
+    })
+
+
+   } catch(error)
+   {
+    return res.status(500).json({
+      error: true,
+      msg: "Internal server Error",
+    });
+   }
+
+})
+
 app.listen(3000);
 module.exports = app;
