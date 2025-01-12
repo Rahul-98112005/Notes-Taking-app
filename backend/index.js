@@ -141,8 +141,7 @@ return res.sendStatus(401);
 app.post("/add-note", authenticateToken, async(req,res) => {
 
 const { title, content, tags } = req.body
-const { user } = req.user
-console.log(acessToken)
+const { user } = req.user;
 
 if(!title)
 {
@@ -297,13 +296,6 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async ( req ,res ) => 
   const { isPinned } = req.body
   const { user } = req.user
 
-  if(!isPinned) {
-    return res.status(400).json({
-     error: true,
-     msg: "No chnages provided"
-    })
-  }
-
   try {
    const note = await Note.findOne({_id: noteId, userId: user._id});
 
@@ -315,8 +307,8 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async ( req ,res ) => 
      })
    }
   
-   
-    note.isPinned = isPinned  ;
+  
+      note.isPinned = isPinned 
    
 
    await note.save();
@@ -337,6 +329,43 @@ app.put("/update-note-pinned/:noteId", authenticateToken, async ( req ,res ) => 
   }
 
 });
+
+app.get('/search-notes/', authenticateToken, async ( req,res) => {
+  const {user} = req.user;
+  const { query } = req.query;
+
+  if(!query) {
+    return res.status(400).json({
+      errors: true,
+      message: "Search query is required"
+    })
+  }
+
+  try {
+    const matchingNotes = await Note.find({
+      userId: user._id,
+      $or: [
+        {title: {$regex: new RegExp(query, 'i')}},
+        {content: {$regex: new RegExp(query, 'i')}}
+      ],
+    });
+    return res.json({
+      error: false,
+      notes: matchingNotes,
+      message: "Notes matching the search query retrived successfully"
+    })
+
+
+  }catch(error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal Server Error"
+    })
+
+  }
+
+
+})
 
 app.listen(3000);
 module.exports = app;

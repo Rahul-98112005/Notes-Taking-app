@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { getIntials } from "../../utils/helper";
 
 const ProfileInfo = ({  onLogOut, userInfo }) => {
