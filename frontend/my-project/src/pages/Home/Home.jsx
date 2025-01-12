@@ -2,8 +2,10 @@ import NoteCard from "../../Components/Cards/NoteCard";
 import Navbar from "../../Components/Navbar";
 import { MdAdd } from "react-icons/md";
 import AddEditNotes from "./AddEditNotes";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "react-modal";
+import { useNavigate } from "react-router";
+import axiosInstance from "../../utils/axiosInstance";
 
 const Home = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -11,6 +13,33 @@ const Home = () => {
     type: "add",
     data: null,
   });
+
+  const [userInfo, setuserInfo] = useState(null);
+  const navigate = useNavigate();
+  const getUserInfo =  async () => {
+    try {
+      const response = await axiosInstance.get('/get-user');
+      if( response.data && response.data.use)
+      {
+        setuserInfo(response.dataUser)
+      }
+    } catch (error)
+    {
+      if(error.response.status == 401)
+      {
+        localStorage.clear();
+        navigate('/login');
+
+      }
+    }
+
+  }
+
+  useEffect(() => {
+    getUserInfo();
+    return () => {};
+  }, [])
+
   return (
     <>
       <Navbar />
