@@ -19,9 +19,9 @@ const Home = () => {
   const getUserInfo =  async () => {
     try {
       const response = await axiosInstance.get('/get-user');
-      if( response.data && response.data.use)
+      if( response.data && response.data.user)
       {
-        setuserInfo(response.dataUser)
+        setuserInfo(response.data.user)
       }
     } catch (error)
     {
@@ -38,11 +38,11 @@ const Home = () => {
   useEffect(() => {
     getUserInfo();
     return () => {};
-  }, [])
+  }, []);
 
   return (
     <>
-      <Navbar />
+      <Navbar userInfo={userInfo} />
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8">
           <NoteCard
